@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { getContacts } from '../../redux/selectors';
 import styles from './ContactForm.module.css';
 
 function ContactForm({ onSubmit }) {
-  let contacts = useSelector(state => state.contacts);
+  let contacts = useSelector(getContacts);
 
   const handleSubmit = e => {
     e.preventDefault();

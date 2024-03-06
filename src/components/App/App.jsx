@@ -1,20 +1,35 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  getError,
+  getContacts,
+  getIsLoading,
+  getStatusFilter,
+} from '../../redux/selectors';
+import {
+  fetchContacts,
+  addContact,
+  deleteContact,
+} from '../../redux/operations';
+
+import styles from './App.module.css';
 import ContactForm from '../ContactForm/ContactForm';
 import Filter from '../Filter/Filter';
 import ContactList from '../ContactList/ContactList';
-import { addContact, deleteContact } from '../../redux/contactsSlice';
+
 import { setFilter } from '../../redux/filterSlice';
-import styles from './App.module.css';
 
 const App = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts);
-  const filter = useSelector(state => state.filter);
+  const isLoading = useSelector(getIsLoading);
+  const error = useSelector(getError);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getStatusFilter);
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(filter)
-  );
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const handleSubmit = newContact => {
     dispatch(addContact(newContact));
@@ -24,12 +39,19 @@ const App = () => {
     dispatch(setFilter(e.target.value));
   };
 
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter)
+  );
+
   const handleClick = e => {
     dispatch(deleteContact(e.target.id));
   };
 
   return (
     <div className={styles.phonebook}>
+      {isLoading && <b>Loading tasks...</b>}
+      {error && <b>{error}</b>}
+
       <h1>Phonebook</h1>
       <ContactForm onSubmit={handleSubmit} />
       <h2>Contacts</h2>
